@@ -120,7 +120,7 @@
     }
     .icon-button:hover { border-color: var(--cp-border-strong); background: var(--cp-surface-soft); }
     .icon-button svg { width: 18px; height: 18px; }
-    #languageButton { width: 42px; font-size: 11px; font-weight: 750; }
+    #languageButton { width: 72px; font-size: 11px; font-weight: 750; }
     .pin-button.active {
       border-color: var(--cp-accent);
       background: var(--cp-accent-soft);
@@ -328,6 +328,28 @@
       color: var(--cp-text);
       text-align: center;
     }
+    .language-picker {
+      display: inline-flex;
+      padding: 3px;
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      background: var(--cp-surface-soft);
+    }
+    .language-option {
+      min-width: 58px;
+      height: 30px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--cp-text-muted);
+      cursor: pointer;
+    }
+    .language-option.active {
+      background: var(--cp-surface);
+      color: var(--cp-accent);
+      font-weight: 700;
+      box-shadow: 0 0 0 1px var(--cp-border);
+    }
     .switch { position: relative; width: 40px; height: 22px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
@@ -503,7 +525,7 @@
         </div>
       </div>
       <div class="top-actions">
-        <button class="icon-button" id="languageButton" title="English" aria-label="Switch language">EN</button>
+        <button class="icon-button" id="languageButton" title="切换语言" aria-label="切换语言">中文 / EN</button>
         <button class="icon-button pin-button" id="pinButton" title="始终置顶" aria-label="切换始终置顶">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 3 8 8M13 4l7 7-3 2-3 5-2-2-6 6-1-1 6-6-2-2 5-3 2-3-3-3Z"/></svg>
         </button>
@@ -605,6 +627,16 @@
         </button>
       </div>
       <section class="settings-group">
+        <h3 id="languageHeading">界面语言</h3>
+        <div class="setting-row">
+          <label id="languageLabel">选择语言</label>
+          <div class="language-picker" role="group" aria-labelledby="languageLabel">
+            <button class="language-option" data-language="zh">中文</button>
+            <button class="language-option" data-language="en">English</button>
+          </div>
+        </div>
+      </section>
+      <section class="settings-group">
         <h3>时长（分钟）</h3>
         <div class="setting-row"><label for="focusMinutes">专注</label><input class="number-input" id="focusMinutes" type="number" min="1" max="120"></div>
         <div class="setting-row"><label for="shortMinutes">短休息</label><input class="number-input" id="shortMinutes" type="number" min="1" max="60"></div>
@@ -685,7 +717,8 @@
           minutes: "分钟", total: "累计专注", streak: "连续专注天数", days: "天",
           recent: "最近完成", items: "项", tipTitle: "专注建议",
           tip: "开始前明确一个可完成的小目标。计时期间只处理这一件事，其他想法先记下，休息时再处理。",
-          settings: "计时设置", duration: "时长（分钟）", automation: "自动化",
+          settings: "计时设置", language: "界面语言", chooseLanguage: "选择语言",
+          duration: "时长（分钟）", automation: "自动化",
           autoBreak: "自动开始休息", autoFocus: "休息后自动专注",
           sound: "结束提示音", data: "数据", clear: "清除全部专注记录",
           untitled: "无标题专注", empty: "今天还没有完成记录。<br>从一个番茄开始吧。",
@@ -705,7 +738,8 @@
           minutes: "minutes", total: "Focus time", streak: "Current streak", days: "days",
           recent: "Recently Completed", items: "items", tipTitle: "Focus Tip",
           tip: "Choose one small, achievable goal before you begin. Capture other thoughts and return to them during your break.",
-          settings: "Timer Settings", duration: "Duration (minutes)", automation: "Automation",
+          settings: "Timer Settings", language: "Interface Language", chooseLanguage: "Choose language",
+          duration: "Duration (minutes)", automation: "Automation",
           autoBreak: "Start breaks automatically", autoFocus: "Start focus after breaks",
           sound: "Completion sound", data: "Data", clear: "Clear all focus records",
           untitled: "Untitled focus", empty: "No completed sessions today.<br>Start with one Pomodoro.",
@@ -812,18 +846,23 @@
         document.querySelector(".hint-copy").textContent = t("tip");
         $("settingsTitle").textContent = t("settings");
         const groups = [...document.querySelectorAll(".settings-group")];
-        groups[0].querySelector("h3").textContent = t("duration");
-        groups[0].querySelectorAll("label").forEach((label, index) => {
+        groups[0].querySelector("h3").textContent = t("language");
+        $("languageLabel").textContent = t("chooseLanguage");
+        document.querySelectorAll(".language-option").forEach((button) => {
+          button.classList.toggle("active", button.dataset.language === language());
+        });
+        groups[1].querySelector("h3").textContent = t("duration");
+        groups[1].querySelectorAll("label").forEach((label, index) => {
           label.textContent = phaseName(["focus", "short", "long"][index]);
         });
-        groups[1].querySelector("h3").textContent = t("automation");
-        groups[1].querySelector('label[for="autoBreak"]').textContent = t("autoBreak");
-        groups[1].querySelector('label[for="autoFocus"]').textContent = t("autoFocus");
-        groups[1].querySelector('label[for="soundEnabled"]').textContent = t("sound");
-        groups[2].querySelector("h3").textContent = t("data");
+        groups[2].querySelector("h3").textContent = t("automation");
+        groups[2].querySelector('label[for="autoBreak"]').textContent = t("autoBreak");
+        groups[2].querySelector('label[for="autoFocus"]').textContent = t("autoFocus");
+        groups[2].querySelector('label[for="soundEnabled"]').textContent = t("sound");
+        groups[3].querySelector("h3").textContent = t("data");
         $("clearData").textContent = t("clear");
-        $("languageButton").textContent = language() === "zh" ? "EN" : "中文";
-        $("languageButton").title = language() === "zh" ? "English" : "中文";
+        $("languageButton").textContent = "中文 / EN";
+        $("languageButton").title = t("language");
         $("todayDate").textContent = new Date().toLocaleDateString(
           language() === "zh" ? "zh-CN" : "en-US",
           { month: "short", day: "numeric", weekday: "short" }
@@ -1016,6 +1055,13 @@
         state.settings.language = language() === "zh" ? "en" : "zh";
         save();
         applyTranslations();
+      });
+      document.querySelectorAll(".language-option").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.settings.language = button.dataset.language;
+          save();
+          applyTranslations();
+        });
       });
       $("pinButton").addEventListener("click", async () => {
         if (!desktop) return;
