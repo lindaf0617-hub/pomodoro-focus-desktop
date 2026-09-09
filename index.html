@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>专注番茄钟</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    .app {
+      width: min(100%, 1100px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 24px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      -webkit-app-region: drag;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .brand h1 { margin: 0; font-size: 18px; letter-spacing: -0.3px; }
+    .brand p { margin: 2px 0 0; color: var(--cp-text-muted); font-size: 12px; }
+    .top-actions { display: flex; align-items: center; gap: 8px; -webkit-app-region: no-drag; }
+    .icon-button {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      background: var(--cp-surface);
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease;
+    }
+    .icon-button:hover { border-color: var(--cp-border-strong); background: var(--cp-surface-soft); }
+    .icon-button svg { width: 18px; height: 18px; }
+    #languageButton { width: 42px; font-size: 11px; font-weight: 750; }
+    .pin-button.active {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .timer-card, .side-card {
+      border: 1px solid var(--cp-border);
+      background: var(--cp-surface);
+      box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
+    }
+    .timer-card {
+      min-height: 620px;
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .phase-switcher {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 10px;
+      background: var(--cp-surface-soft);
+    }
+    .phase-button {
+      min-width: 94px;
+      padding: 8px 12px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--cp-text-muted);
+      cursor: pointer;
+    }
+    .phase-button.active {
+      background: var(--cp-surface);
+      color: var(--cp-accent);
+      font-weight: 650;
+      box-shadow: 0 0 0 1px var(--cp-border);
+    }
+    .timer-wrap {
+      position: relative;
+      width: 310px;
+      height: 310px;
+      display: grid;
+      place-items: center;
+    }
+    .timer-ring { position: absolute; inset: 0; transform: rotate(-90deg); }
+    .timer-ring circle { fill: none; stroke-width: 8; }
+    .ring-track { stroke: var(--cp-surface-soft); }
+    .ring-progress {
+      stroke: var(--cp-accent);
+      stroke-linecap: round;
+      transition: stroke-dashoffset 500ms linear;
+    }
+    .timer-content { position: relative; text-align: center; }
+    .phase-label {
+      margin-bottom: 8px;
+      color: var(--cp-accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+    .time {
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: clamp(54px, 8vw, 76px);
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .rounds { margin-top: 14px; color: var(--cp-text-muted); font-size: 13px; }
+    .dots { display: inline-flex; gap: 6px; margin-left: 7px; vertical-align: middle; }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      border: 1px solid var(--cp-border-strong);
+    }
+    .dot.done { border-color: var(--cp-accent); background: var(--cp-accent); }
+    .task-area { width: min(100%, 510px); }
+    .task-label { display: block; margin: 0 0 8px 2px; color: var(--cp-text-muted); font-size: 12px; font-weight: 650; }
+    .task-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      outline: none;
+      background: var(--cp-bg-elevated);
+      color: var(--cp-text);
+    }
+    .task-input:focus { border-color: var(--cp-accent); box-shadow: 0 0 0 3px var(--cp-accent-soft); }
+    .controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 22px; }
+    .primary-button {
+      min-width: 150px;
+      height: 48px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .primary-button:hover { background: var(--cp-accent-hover); }
+    .secondary-button {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      background: var(--cp-surface);
+      cursor: pointer;
+    }
+    .secondary-button:hover { border-color: var(--cp-border-strong); background: var(--cp-surface-soft); }
+    .secondary-button svg { width: 19px; height: 19px; }
+    .shortcut { margin-top: 12px; text-align: center; color: var(--cp-text-soft); font-size: 11px; }
+    kbd {
+      padding: 2px 5px;
+      border: 1px solid var(--cp-border);
+      border-radius: 4px;
+      background: var(--cp-surface-soft);
+      font-family: inherit;
+    }
+    .sidebar { display: flex; flex-direction: column; gap: 16px; }
+    .side-card { border-radius: 16px; padding: 20px; }
+    .side-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .side-title h2 { margin: 0; font-size: 14px; }
+    .date { color: var(--cp-text-muted); font-size: 11px; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat {
+      min-height: 92px;
+      padding: 14px;
+      border-radius: 10px;
+      background: var(--cp-surface-soft);
+    }
+    .stat-value { font-size: 25px; font-weight: 750; letter-spacing: -1px; }
+    .stat-label { margin-top: 6px; color: var(--cp-text-muted); font-size: 11px; }
+    .streak { grid-column: 1 / -1; min-height: auto; display: flex; justify-content: space-between; align-items: center; }
+    .streak .stat-label { margin: 0; }
+    .streak .stat-value { color: var(--cp-accent); font-size: 18px; }
+    .timeline { display: flex; flex-direction: column; gap: 13px; }
+    .empty { color: var(--cp-text-muted); font-size: 12px; line-height: 1.6; }
+    .history-item { display: grid; grid-template-columns: 7px 1fr auto; gap: 10px; align-items: center; }
+    .history-mark { width: 7px; height: 7px; border-radius: 50%; background: var(--cp-accent); }
+    .history-task { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+    .history-time { color: var(--cp-text-muted); font-size: 10px; }
+    .hint-card {
+      margin-top: auto;
+      border-color: var(--cp-accent);
+      background: var(--cp-accent-soft);
+    }
+    .hint-title { color: var(--cp-accent); font-size: 12px; font-weight: 700; }
+    .hint-copy { margin: 7px 0 0; color: var(--cp-text-muted); font-size: 11px; line-height: 1.55; }
+    .scrim {
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: flex-end;
+      background: var(--cp-overlay);
+      z-index: 10;
+    }
+    .scrim.open { display: flex; }
+    .settings-panel {
+      width: min(100%, 390px);
+      height: 100%;
+      overflow: auto;
+      padding: 28px;
+      border-left: 1px solid var(--cp-border);
+      background: var(--cp-panel-strong);
+      box-shadow: var(--cp-shadow);
+    }
+    .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .settings-header h2 { margin: 0; font-size: 19px; }
+    .settings-group { margin-bottom: 28px; }
+    .settings-group h3 { margin: 0 0 12px; color: var(--cp-text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 48px;
+      border-bottom: 1px solid var(--cp-border);
+    }
+    .setting-row label { font-size: 13px; }
+    .number-input {
+      width: 72px;
+      height: 34px;
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      text-align: center;
+    }
+    .switch { position: relative; width: 40px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 22px;
+      background: var(--cp-surface-soft);
+      cursor: pointer;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: var(--cp-border-strong);
+      transition: transform 160ms ease;
+    }
+    .switch input:checked + .slider { border-color: var(--cp-accent); background: var(--cp-accent); }
+    .switch input:checked + .slider::before { transform: translateX(18px); background: var(--cp-accent-fg); }
+    .danger-button {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--cp-danger);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--cp-danger);
+      cursor: pointer;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 20;
+      max-width: calc(100% - 32px);
+      padding: 10px 16px;
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      background: var(--cp-panel-strong);
+      box-shadow: var(--cp-shadow);
+      color: var(--cp-text);
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 12px);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    body.compact { overflow: hidden; }
+    body.compact .app {
+      width: 100%;
+      min-height: 88px;
+      height: 88px;
+      margin: 0;
+      padding: 0;
+      gap: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: 0;
+      background: var(--cp-surface);
+      box-shadow: none;
+    }
+    body.compact .topbar {
+      min-height: 24px;
+      padding: 0 4px 0 8px;
+      border-bottom: 1px solid var(--cp-border);
+      background: var(--cp-surface);
+    }
+    body.compact .brand-mark,
+    body.compact .brand h1,
+    body.compact .brand p,
+    body.compact #themeButton,
+    body.compact #languageButton,
+    body.compact #settingsButton,
+    body.compact #minimizeButton { display: none; }
+    body.compact .brand::after {
+      content: "专注番茄钟";
+      color: var(--cp-text-muted);
+      font-size: 10px;
+      font-weight: 650;
+    }
+    body.compact .icon-button {
+      width: 22px;
+      height: 20px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+    }
+    body.compact .icon-button svg { width: 12px; height: 12px; }
+    body.compact .workspace { display: block; }
+    body.compact .timer-card {
+      min-height: 64px;
+      padding: 5px 8px 7px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px;
+      border: 0;
+      border-radius: 0;
+      background: var(--cp-surface);
+      box-shadow: none;
+    }
+    body.compact .phase-switcher,
+    body.compact .timer-ring,
+    body.compact .rounds,
+    body.compact .task-label,
+    body.compact .task-input,
+    body.compact #skipButton,
+    body.compact .shortcut,
+    body.compact .sidebar { display: none; }
+    body.compact .timer-wrap {
+      width: auto;
+      height: auto;
+      display: block;
+    }
+    body.compact .timer-content {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      text-align: left;
+    }
+    body.compact .phase-label {
+      margin: 0;
+      min-width: 44px;
+      padding: 0;
+      background: transparent;
+      font-size: 10px;
+      letter-spacing: 0;
+    }
+    body.compact .time {
+      font-size: 29px;
+      font-weight: 650;
+      letter-spacing: -2px;
+    }
+    body.compact .task-area { width: auto; }
+    body.compact .controls { margin: 0; }
+    body.compact .primary-button {
+      min-width: 58px;
+      width: 58px;
+      height: 30px;
+      padding: 0 5px;
+      border: 0;
+      border-radius: 10px;
+      box-shadow: none;
+      font-size: 10px;
+    }
+    @media (max-width: 820px) {
+      .workspace { grid-template-columns: 1fr; }
+      .timer-card { min-height: 570px; }
+      .sidebar { display: grid; grid-template-columns: 1fr 1fr; }
+      .hint-card { grid-column: 1 / -1; }
+    }
+    @media (max-width: 560px) {
+      .app { padding: 16px; gap: 16px; }
+      .timer-card { min-height: 540px; padding: 22px 16px; }
+      .timer-wrap { width: 270px; height: 270px; }
+      .phase-button { min-width: auto; }
+      .sidebar { display: flex; }
+      .brand p { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">25</div>
+        <div>
+          <h1>专注番茄钟</h1>
+          <p>把注意力留给真正重要的事</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="languageButton" title="English" aria-label="Switch language">EN</button>
+        <button class="icon-button pin-button" id="pinButton" title="始终置顶" aria-label="切换始终置顶">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 3 8 8M13 4l7 7-3 2-3 5-2-2-6 6-1-1 6-6-2-2 5-3 2-3-3-3Z"/></svg>
+        </button>
+        <button class="icon-button" id="compactButton" title="迷你悬浮窗 (Ctrl+Alt+M)" aria-label="切换迷你悬浮窗">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+        </button>
+        <button class="icon-button" id="themeButton" title="切换主题" aria-label="切换主题">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a9 9 0 1 0 9 9c0-.5-.04-1-.12-1.47A7 7 0 0 1 13.47 3.1C13 3.04 12.5 3 12 3Z"/></svg>
+        </button>
+        <button class="icon-button" id="settingsButton" title="设置" aria-label="打开设置">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.2 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.4v-4h.1A1.7 1.7 0 0 0 4.2 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 8.6 4.2a1.7 1.7 0 0 0 1-.6A1.7 1.7 0 0 0 10 2.5v-.1h4v.1a1.7 1.7 0 0 0 1 1.7 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 8.6a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.7 1Z"/></svg>
+        </button>
+        <button class="icon-button" id="minimizeButton" title="最小化" aria-label="最小化窗口">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14"/></svg>
+        </button>
+        <button class="icon-button" id="closeButton" title="隐藏到系统托盘" aria-label="隐藏到系统托盘">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <article class="timer-card">
+        <div class="phase-switcher" role="tablist" aria-label="计时模式">
+          <button class="phase-button active" data-phase="focus">专注</button>
+          <button class="phase-button" data-phase="short">短休息</button>
+          <button class="phase-button" data-phase="long">长休息</button>
+        </div>
+
+        <div class="timer-wrap">
+          <svg class="timer-ring" viewBox="0 0 320 320" aria-hidden="true">
+            <circle class="ring-track" cx="160" cy="160" r="146"></circle>
+            <circle class="ring-progress" id="ringProgress" cx="160" cy="160" r="146"></circle>
+          </svg>
+          <div class="timer-content">
+            <div class="phase-label" id="phaseLabel">准备专注</div>
+            <div class="time" id="timeDisplay">25:00</div>
+            <div class="rounds">今日进度 <span class="dots" id="roundDots"></span></div>
+          </div>
+        </div>
+
+        <div class="task-area">
+          <label class="task-label" for="taskInput">这一轮要完成什么？</label>
+          <input class="task-input" id="taskInput" maxlength="80" placeholder="例如：完成产品首页设计" autocomplete="off">
+          <div class="controls">
+            <button class="primary-button" id="startButton">开始专注</button>
+            <button class="secondary-button" id="skipButton" title="结束当前阶段" aria-label="结束当前阶段">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 5 9 7-9 7V5Z"/><path d="M18 5v14"/></svg>
+            </button>
+          </div>
+          <div class="shortcut">按 <kbd>Space</kbd> 开始或暂停</div>
+        </div>
+      </article>
+
+      <aside class="sidebar">
+        <section class="side-card">
+          <div class="side-title">
+            <h2>今日专注</h2>
+            <span class="date" id="todayDate"></span>
+          </div>
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="stat-value" id="todayRounds">0</div>
+              <div class="stat-label">完成番茄</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value"><span id="todayMinutes">0</span><small> 分钟</small></div>
+              <div class="stat-label">累计专注</div>
+            </div>
+            <div class="stat streak">
+              <div class="stat-label">连续专注天数</div>
+              <div class="stat-value"><span id="streakDays">0</span> 天</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="side-card">
+          <div class="side-title">
+            <h2>最近完成</h2>
+            <span class="date" id="historyCount">0 项</span>
+          </div>
+          <div class="timeline" id="historyList"></div>
+        </section>
+
+        <section class="side-card hint-card">
+          <div class="hint-title">专注建议</div>
+          <p class="hint-copy">开始前明确一个可完成的小目标。计时期间只处理这一件事，其他想法先记下，休息时再处理。</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <div class="scrim" id="settingsScrim">
+    <aside class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="settings-header">
+        <h2 id="settingsTitle">计时设置</h2>
+        <button class="icon-button" id="closeSettings" aria-label="关闭设置">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <section class="settings-group">
+        <h3>时长（分钟）</h3>
+        <div class="setting-row"><label for="focusMinutes">专注</label><input class="number-input" id="focusMinutes" type="number" min="1" max="120"></div>
+        <div class="setting-row"><label for="shortMinutes">短休息</label><input class="number-input" id="shortMinutes" type="number" min="1" max="60"></div>
+        <div class="setting-row"><label for="longMinutes">长休息</label><input class="number-input" id="longMinutes" type="number" min="1" max="90"></div>
+      </section>
+      <section class="settings-group">
+        <h3>自动化</h3>
+        <div class="setting-row">
+          <label for="autoBreak">自动开始休息</label>
+          <span class="switch"><input id="autoBreak" type="checkbox"><span class="slider"></span></span>
+        </div>
+        <div class="setting-row">
+          <label for="autoFocus">休息后自动专注</label>
+          <span class="switch"><input id="autoFocus" type="checkbox"><span class="slider"></span></span>
+        </div>
+        <div class="setting-row">
+          <label for="soundEnabled">结束提示音</label>
+          <span class="switch"><input id="soundEnabled" type="checkbox"><span class="slider"></span></span>
+        </div>
+      </section>
+      <section class="settings-group">
+        <h3>数据</h3>
+        <button class="danger-button" id="clearData">清除全部专注记录</button>
+      </section>
+    </aside>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "pomodoro-focus-v1";
+      const defaults = {
+        settings: {
+          focus: 25,
+          short: 5,
+          long: 15,
+          autoBreak: false,
+          autoFocus: false,
+          sound: true,
+          language: navigator.language.toLowerCase().startsWith("zh") ? "zh" : "en"
+        },
+        history: [],
+        phase: "focus",
+        completedInCycle: 0,
+        task: "",
+        timer: { running: false, endAt: null, remaining: 25 * 60 }
+      };
+
+      const loadState = () => {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+          if (!saved) return structuredClone(defaults);
+          return {
+            ...structuredClone(defaults),
+            ...saved,
+            settings: { ...defaults.settings, ...saved.settings },
+            timer: { ...defaults.timer, ...saved.timer },
+            history: Array.isArray(saved.history) ? saved.history : []
+          };
+        } catch {
+          return structuredClone(defaults);
+        }
+      };
+
+      let state = loadState();
+      let ticker = null;
+      let toastTimer = null;
+      const circumference = 2 * Math.PI * 146;
+      const copy = {
+        zh: {
+          app: "专注番茄钟", tagline: "把注意力留给真正重要的事",
+          focus: "专注", short: "短休息", long: "长休息", readyFocus: "准备专注",
+          readyBreak: "准备休息", focusing: "正在专注", resting: "正在休息",
+          progress: "今日进度", taskPrompt: "这一轮要完成什么？",
+          taskPlaceholder: "例如：完成产品首页设计", startFocus: "开始专注",
+          startBreak: "开始休息", pause: "暂停", resume: "继续",
+          shortcut: "按 Space 开始或暂停", today: "今日专注", completed: "完成番茄",
+          minutes: "分钟", total: "累计专注", streak: "连续专注天数", days: "天",
+          recent: "最近完成", items: "项", tipTitle: "专注建议",
+          tip: "开始前明确一个可完成的小目标。计时期间只处理这一件事，其他想法先记下，休息时再处理。",
+          settings: "计时设置", duration: "时长（分钟）", automation: "自动化",
+          autoBreak: "自动开始休息", autoFocus: "休息后自动专注",
+          sound: "结束提示音", data: "数据", clear: "清除全部专注记录",
+          untitled: "无标题专注", empty: "今天还没有完成记录。<br>从一个番茄开始吧。",
+          count: (n) => `${n} 项`, switched: (phase) => `已切换到${phase}`,
+          focusDone: "专注完成，休息一下吧。", breakDone: "休息结束，准备下一轮专注。",
+          cleared: "专注记录已清除", pinOn: "取消始终置顶", pinOff: "始终置顶",
+          compactOn: "展开完整窗口 (Ctrl+Alt+M)", compactOff: "迷你悬浮窗 (Ctrl+Alt+M)"
+        },
+        en: {
+          app: "Pomodoro Focus", tagline: "Keep your attention on what matters",
+          focus: "Focus", short: "Short Break", long: "Long Break", readyFocus: "Ready to focus",
+          readyBreak: "Ready to rest", focusing: "Focusing", resting: "On a break",
+          progress: "Today's progress", taskPrompt: "What will you finish this round?",
+          taskPlaceholder: "Example: Finish the product homepage", startFocus: "Start Focus",
+          startBreak: "Start Break", pause: "Pause", resume: "Resume",
+          shortcut: "Press Space to start or pause", today: "Today's Focus", completed: "Pomodoros",
+          minutes: "minutes", total: "Focus time", streak: "Current streak", days: "days",
+          recent: "Recently Completed", items: "items", tipTitle: "Focus Tip",
+          tip: "Choose one small, achievable goal before you begin. Capture other thoughts and return to them during your break.",
+          settings: "Timer Settings", duration: "Duration (minutes)", automation: "Automation",
+          autoBreak: "Start breaks automatically", autoFocus: "Start focus after breaks",
+          sound: "Completion sound", data: "Data", clear: "Clear all focus records",
+          untitled: "Untitled focus", empty: "No completed sessions today.<br>Start with one Pomodoro.",
+          count: (n) => `${n} items`, switched: (phase) => `Switched to ${phase}`,
+          focusDone: "Focus complete. Take a break.", breakDone: "Break complete. Ready for the next round.",
+          cleared: "Focus records cleared", pinOn: "Disable always on top", pinOff: "Always on top",
+          compactOn: "Expand window (Ctrl+Alt+M)", compactOff: "Compact window (Ctrl+Alt+M)"
+        }
+      };
+      const language = () => state.settings.language === "en" ? "en" : "zh";
+      const t = (key) => copy[language()][key];
+      const phaseName = (phase) => t(phase);
+      const $ = (id) => document.getElementById(id);
+      const phaseButtons = [...document.querySelectorAll(".phase-button")];
+      const desktop = window.desktop;
+
+      const durationFor = (phase) => state.settings[phase] * 60;
+      const localDateKey = (date = new Date()) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        const d = String(date.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+      };
+      const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+      const showToast = (message) => {
+        $("toast").textContent = message;
+        $("toast").classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => $("toast").classList.remove("show"), 2400);
+      };
+
+      const formatTime = (seconds) => {
+        const safe = Math.max(0, Math.ceil(seconds));
+        return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
+      };
+
+      const getRemaining = () => {
+        if (!state.timer.running || !state.timer.endAt) return state.timer.remaining;
+        return Math.max(0, (state.timer.endAt - Date.now()) / 1000);
+      };
+
+      const todayRecords = () => state.history.filter((item) => item.date === localDateKey());
+
+      const calculateStreak = () => {
+        const days = new Set(state.history.map((item) => item.date));
+        let streak = 0;
+        const cursor = new Date();
+        if (!days.has(localDateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+        while (days.has(localDateKey(cursor))) {
+          streak += 1;
+          cursor.setDate(cursor.getDate() - 1);
+        }
+        return streak;
+      };
+
+      const updateStats = () => {
+        const today = todayRecords();
+        $("todayRounds").textContent = today.length;
+        $("todayMinutes").textContent = today.reduce((sum, item) => sum + item.minutes, 0);
+        $("streakDays").textContent = calculateStreak();
+        $("historyCount").textContent = t("count")(today.length);
+        $("roundDots").innerHTML = Array.from({ length: 4 }, (_, index) =>
+          `<span class="dot${index < state.completedInCycle ? " done" : ""}"></span>`
+        ).join("");
+
+        const latest = today.slice(-4).reverse();
+        $("historyList").innerHTML = latest.length
+          ? latest.map((item) => `
+              <div class="history-item">
+                <span class="history-mark"></span>
+                <span class="history-task" title="${escapeHtml(item.task)}">${escapeHtml(item.task || t("untitled"))}</span>
+                <span class="history-time">${item.time}</span>
+              </div>`).join("")
+          : `<div class="empty">${t("empty")}</div>`;
+      };
+
+      const escapeHtml = (value) => String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+      const applyTranslations = () => {
+        document.documentElement.lang = language() === "zh" ? "zh-CN" : "en";
+        document.querySelector(".brand h1").textContent = t("app");
+        document.querySelector(".brand p").textContent = t("tagline");
+        phaseButtons.forEach((button) => { button.textContent = phaseName(button.dataset.phase); });
+        document.querySelector(".rounds").childNodes[0].textContent = `${t("progress")} `;
+        document.querySelector(".task-label").textContent = t("taskPrompt");
+        $("taskInput").placeholder = t("taskPlaceholder");
+        document.querySelector(".shortcut").innerHTML = language() === "zh"
+          ? '按 <kbd>Space</kbd> 开始或暂停'
+          : 'Press <kbd>Space</kbd> to start or pause';
+        document.querySelector(".sidebar .side-card:nth-child(1) h2").textContent = t("today");
+        document.querySelector("#todayRounds + .stat-label").textContent = t("completed");
+        document.querySelector("#todayMinutes + small").textContent = ` ${t("minutes")}`;
+        document.querySelector("#todayMinutes").closest(".stat").querySelector(".stat-label").textContent = t("total");
+        document.querySelector(".streak .stat-label").textContent = t("streak");
+        document.querySelector("#streakDays").parentElement.lastChild.textContent = ` ${t("days")}`;
+        document.querySelector(".sidebar .side-card:nth-child(2) h2").textContent = t("recent");
+        document.querySelector(".hint-title").textContent = t("tipTitle");
+        document.querySelector(".hint-copy").textContent = t("tip");
+        $("settingsTitle").textContent = t("settings");
+        const groups = [...document.querySelectorAll(".settings-group")];
+        groups[0].querySelector("h3").textContent = t("duration");
+        groups[0].querySelectorAll("label").forEach((label, index) => {
+          label.textContent = phaseName(["focus", "short", "long"][index]);
+        });
+        groups[1].querySelector("h3").textContent = t("automation");
+        groups[1].querySelector('label[for="autoBreak"]').textContent = t("autoBreak");
+        groups[1].querySelector('label[for="autoFocus"]').textContent = t("autoFocus");
+        groups[1].querySelector('label[for="soundEnabled"]').textContent = t("sound");
+        groups[2].querySelector("h3").textContent = t("data");
+        $("clearData").textContent = t("clear");
+        $("languageButton").textContent = language() === "zh" ? "EN" : "中文";
+        $("languageButton").title = language() === "zh" ? "English" : "中文";
+        $("todayDate").textContent = new Date().toLocaleDateString(
+          language() === "zh" ? "zh-CN" : "en-US",
+          { month: "short", day: "numeric", weekday: "short" }
+        );
+        desktop?.setLanguage(language());
+        render();
+      };
+
+      const render = () => {
+        const remaining = getRemaining();
+        const duration = durationFor(state.phase);
+        const progress = Math.min(1, Math.max(0, 1 - remaining / duration));
+        $("timeDisplay").textContent = formatTime(remaining);
+        $("ringProgress").style.strokeDasharray = circumference;
+        $("ringProgress").style.strokeDashoffset = circumference * (1 - progress);
+        $("phaseLabel").textContent = state.timer.running
+          ? (state.phase === "focus" ? t("focusing") : t("resting"))
+          : (state.phase === "focus" ? t("readyFocus") : t("readyBreak"));
+        $("startButton").textContent = state.timer.running
+          ? t("pause")
+          : (remaining < duration ? t("resume") : (state.phase === "focus" ? t("startFocus") : t("startBreak")));
+        phaseButtons.forEach((button) => button.classList.toggle("active", button.dataset.phase === state.phase));
+        document.title = `${formatTime(remaining)} · ${phaseName(state.phase)}`;
+        updateStats();
+      };
+
+      const applyWindowState = (windowState) => {
+        if (!windowState) return;
+        document.body.classList.toggle("compact", windowState.compact);
+        $("pinButton").classList.toggle("active", windowState.alwaysOnTop);
+        $("pinButton").title = windowState.alwaysOnTop ? t("pinOn") : t("pinOff");
+        $("compactButton").title = windowState.compact ? t("compactOn") : t("compactOff");
+      };
+
+      const playTone = () => {
+        if (!state.settings.sound) return;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const context = new AudioContext();
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.frequency.value = 720;
+        gain.gain.setValueAtTime(0.12, context.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.55);
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.55);
+      };
+
+      const notify = (title, body) => {
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification(title, { body });
+        }
+      };
+
+      const chooseNextPhase = () => {
+        if (state.phase === "focus") return state.completedInCycle === 0 ? "long" : "short";
+        return "focus";
+      };
+
+      const completePhase = (manual = false) => {
+        const completedPhase = state.phase;
+        if (completedPhase === "focus" && !manual) {
+          const now = new Date();
+          state.history.push({
+            id: `${Date.now()}`,
+            date: localDateKey(now),
+            time: now.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false }),
+            minutes: state.settings.focus,
+            task: state.task.trim()
+          });
+          state.completedInCycle = (state.completedInCycle + 1) % 4;
+        }
+
+        const nextPhase = chooseNextPhase();
+        state.phase = nextPhase;
+        state.timer = { running: false, endAt: null, remaining: durationFor(nextPhase) };
+        save();
+        render();
+
+        if (!manual) {
+          playTone();
+          const message = completedPhase === "focus" ? t("focusDone") : t("breakDone");
+          showToast(message);
+          notify(t("app"), message);
+          const shouldAutoStart = completedPhase === "focus" ? state.settings.autoBreak : state.settings.autoFocus;
+          if (shouldAutoStart) startTimer();
+        } else {
+          showToast(t("switched")(phaseName(nextPhase)));
+        }
+      };
+
+      const tick = () => {
+        if (state.timer.running && getRemaining() <= 0) {
+          clearInterval(ticker);
+          ticker = null;
+          completePhase(false);
+          return;
+        }
+        render();
+      };
+
+      const startTimer = async () => {
+        if (state.timer.running) return;
+        if ("Notification" in window && Notification.permission === "default") {
+          await Notification.requestPermission();
+        }
+        state.timer.running = true;
+        state.timer.endAt = Date.now() + state.timer.remaining * 1000;
+        save();
+        clearInterval(ticker);
+        ticker = setInterval(tick, 250);
+        render();
+      };
+
+      const pauseTimer = () => {
+        state.timer.remaining = getRemaining();
+        state.timer.running = false;
+        state.timer.endAt = null;
+        clearInterval(ticker);
+        ticker = null;
+        save();
+        render();
+      };
+
+      const toggleTimer = () => state.timer.running ? pauseTimer() : startTimer();
+
+      const setPhase = (phase) => {
+        if (phase === state.phase) return;
+        if (state.timer.running) pauseTimer();
+        state.phase = phase;
+        state.timer = { running: false, endAt: null, remaining: durationFor(phase) };
+        save();
+        render();
+      };
+
+      const syncSettingsForm = () => {
+        $("focusMinutes").value = state.settings.focus;
+        $("shortMinutes").value = state.settings.short;
+        $("longMinutes").value = state.settings.long;
+        $("autoBreak").checked = state.settings.autoBreak;
+        $("autoFocus").checked = state.settings.autoFocus;
+        $("soundEnabled").checked = state.settings.sound;
+      };
+
+      const applySettings = () => {
+        const oldDuration = durationFor(state.phase);
+        state.settings.focus = Math.min(120, Math.max(1, Number($("focusMinutes").value) || 25));
+        state.settings.short = Math.min(60, Math.max(1, Number($("shortMinutes").value) || 5));
+        state.settings.long = Math.min(90, Math.max(1, Number($("longMinutes").value) || 15));
+        state.settings.autoBreak = $("autoBreak").checked;
+        state.settings.autoFocus = $("autoFocus").checked;
+        state.settings.sound = $("soundEnabled").checked;
+        if (!state.timer.running && Math.abs(state.timer.remaining - oldDuration) < 1) {
+          state.timer.remaining = durationFor(state.phase);
+        }
+        save();
+        render();
+      };
+
+      $("startButton").addEventListener("click", toggleTimer);
+      $("skipButton").addEventListener("click", () => completePhase(true));
+      $("taskInput").addEventListener("input", (event) => {
+        state.task = event.target.value;
+        save();
+      });
+      phaseButtons.forEach((button) => button.addEventListener("click", () => setPhase(button.dataset.phase)));
+      $("settingsButton").addEventListener("click", () => {
+        syncSettingsForm();
+        $("settingsScrim").classList.add("open");
+      });
+      $("closeSettings").addEventListener("click", () => {
+        applySettings();
+        $("settingsScrim").classList.remove("open");
+      });
+      $("settingsScrim").addEventListener("click", (event) => {
+        if (event.target === $("settingsScrim")) {
+          applySettings();
+          $("settingsScrim").classList.remove("open");
+        }
+      });
+      ["focusMinutes", "shortMinutes", "longMinutes", "autoBreak", "autoFocus", "soundEnabled"]
+        .forEach((id) => $(id).addEventListener("change", applySettings));
+      $("themeButton").addEventListener("click", () => {
+        const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        document.documentElement.dataset.theme = next;
+      });
+      $("languageButton").addEventListener("click", () => {
+        state.settings.language = language() === "zh" ? "en" : "zh";
+        save();
+        applyTranslations();
+      });
+      $("pinButton").addEventListener("click", async () => {
+        if (!desktop) return;
+        const current = $("pinButton").classList.contains("active");
+        applyWindowState(await desktop.setAlwaysOnTop(!current));
+      });
+      $("compactButton").addEventListener("click", async () => {
+        if (desktop) applyWindowState(await desktop.toggleCompact());
+      });
+      $("minimizeButton").addEventListener("click", () => desktop?.minimize());
+      $("closeButton").addEventListener("click", () => desktop?.close());
+      $("clearData").addEventListener("click", () => {
+        state.history = [];
+        state.completedInCycle = 0;
+        save();
+        updateStats();
+        showToast(t("cleared"));
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.code === "Space" && event.target.tagName !== "INPUT" && !$("settingsScrim").classList.contains("open")) {
+          event.preventDefault();
+          toggleTimer();
+        }
+        if (event.code === "Escape") {
+          applySettings();
+          $("settingsScrim").classList.remove("open");
+        }
+      });
+      document.addEventListener("visibilitychange", tick);
+
+      $("taskInput").value = state.task;
+      syncSettingsForm();
+      desktop?.getWindowState().then(applyWindowState);
+      desktop?.onWindowState(applyWindowState);
+      desktop?.onToggleTimer(toggleTimer);
+
+      if (state.timer.running) {
+        if (getRemaining() <= 0) completePhase(false);
+        else ticker = setInterval(tick, 250);
+      }
+      applyTranslations();
+    })();
+  </script>
+</body>
+</html>

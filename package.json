@@ -1,0 +1,46 @@
+{
+  "name": "pomodoro-focus-desktop",
+  "version": "1.0.0",
+  "description": "Always-on-top desktop Pomodoro timer",
+  "main": "main.js",
+  "author": "Microsoft Scout",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:windows": "electron-builder --win portable",
+    "build:macos": "electron-builder --mac dmg zip"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.microsoftscout.pomodorofocus",
+    "productName": "专注番茄钟",
+    "files": [
+      "index.html",
+      "icon.png",
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "artifactName": "Pomodoro-Focus-${version}-Windows.${ext}"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "artifactName": "Pomodoro-Focus-${version}-macOS-${arch}.${ext}",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    }
+  }
+}
