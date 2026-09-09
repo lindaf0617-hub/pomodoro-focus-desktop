@@ -8,8 +8,6 @@ A compact desktop Pomodoro timer for Windows and macOS.
 
 ![Pomodoro Focus main window](assets/product-main-en.png)
 
-![Pomodoro Focus compact floating window](assets/product-compact-en.png)
-
 ## 功能特点
 
 - 始终置顶的计时窗口
