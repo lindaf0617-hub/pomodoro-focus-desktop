@@ -19,6 +19,7 @@ always visible.
 - Always-on-top timer window
 - Compact floating mode
 - Chinese and English interfaces
+- Monthly energy calendar that lights up after 4 daily focus sessions
 - Focus, short-break, and long-break cycles
 - Local task history and daily statistics
 - Windows system tray and macOS menu bar controls

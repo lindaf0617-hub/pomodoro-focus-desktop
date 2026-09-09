@@ -132,6 +132,111 @@
       gap: 24px;
       align-items: stretch;
     }
+    .workspace.hidden { display: none; }
+    .energy-view {
+      display: none;
+      min-height: 620px;
+      padding: 28px;
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      background: var(--cp-surface);
+      box-shadow: 0 0 2px var(--cp-border), 0 1px 2px var(--cp-border);
+    }
+    .energy-view.active { display: block; }
+    .energy-header, .calendar-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .energy-title-wrap { display: flex; align-items: center; gap: 14px; }
+    .energy-title-wrap h2 { margin: 0; font-size: 24px; }
+    .energy-title-wrap p { margin: 5px 0 0; color: var(--cp-text-muted); font-size: 12px; }
+    .energy-orb {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+    }
+    .energy-orb svg { width: 28px; height: 28px; }
+    .energy-summary {
+      margin: 28px 0 24px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 12px;
+    }
+    .energy-stat {
+      min-height: 104px;
+      padding: 18px;
+      border-radius: 12px;
+      background: var(--cp-surface-soft);
+    }
+    .energy-stat.primary { background: var(--cp-accent-soft); }
+    .energy-stat strong { display: block; font-size: 30px; letter-spacing: -1px; }
+    .energy-stat.primary strong { color: var(--cp-accent); }
+    .energy-stat span { display: block; margin-top: 8px; color: var(--cp-text-muted); font-size: 12px; }
+    .calendar-toolbar { margin-bottom: 14px; }
+    .calendar-toolbar h3 { margin: 0; font-size: 16px; }
+    .month-actions { display: flex; gap: 6px; }
+    .month-button {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--cp-border);
+      border-radius: 9px;
+      background: var(--cp-surface);
+      cursor: pointer;
+    }
+    .month-button:hover { border-color: var(--cp-border-strong); background: var(--cp-surface-soft); }
+    .weekdays, .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+    .weekdays { margin-bottom: 8px; }
+    .weekday { padding: 7px 0; color: var(--cp-text-muted); font-size: 11px; text-align: center; }
+    .calendar-day {
+      position: relative;
+      min-height: 72px;
+      padding: 9px;
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      background: var(--cp-bg-elevated);
+    }
+    .calendar-day.outside { opacity: 0.35; }
+    .calendar-day.today { border-color: var(--cp-accent); }
+    .calendar-day.full {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent-soft);
+    }
+    .day-number { font-size: 12px; font-weight: 650; }
+    .day-energy {
+      position: absolute;
+      left: 9px;
+      right: 9px;
+      bottom: 9px;
+      display: flex;
+      gap: 3px;
+    }
+    .energy-cell {
+      height: 5px;
+      flex: 1;
+      border-radius: 5px;
+      background: var(--cp-border);
+    }
+    .energy-cell.filled { background: var(--cp-accent); }
+    .full-mark {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      color: var(--cp-accent);
+      font-size: 14px;
+      font-weight: 800;
+    }
     .timer-card, .side-card {
       border: 1px solid var(--cp-border);
       background: var(--cp-surface);
@@ -426,6 +531,7 @@
     body.compact .brand p,
     body.compact #themeButton,
     body.compact #languageButton,
+    body.compact #energyButton,
     body.compact #settingsButton,
     body.compact #minimizeButton { display: none; }
     body.compact .brand::after {
@@ -503,6 +609,7 @@
       .timer-card { min-height: 570px; }
       .sidebar { display: grid; grid-template-columns: 1fr 1fr; }
       .hint-card { grid-column: 1 / -1; }
+      .energy-summary { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       .app { padding: 16px; gap: 16px; }
@@ -511,6 +618,9 @@
       .phase-button { min-width: auto; }
       .sidebar { display: flex; }
       .brand p { display: none; }
+      .energy-view { padding: 18px 12px; }
+      .calendar-day { min-height: 58px; padding: 7px; }
+      .weekdays, .calendar-grid { gap: 4px; }
     }
   </style>
 </head>
@@ -526,6 +636,9 @@
       </div>
       <div class="top-actions">
         <button class="icon-button" id="languageButton" title="切换语言" aria-label="切换语言">中文 / EN</button>
+        <button class="icon-button" id="energyButton" title="能量日历" aria-label="打开能量日历">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 5 14h6l-1 8 8-12h-6l1-8Z"/></svg>
+        </button>
         <button class="icon-button pin-button" id="pinButton" title="始终置顶" aria-label="切换始终置顶">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 3 8 8M13 4l7 7-3 2-3 5-2-2-6 6-1-1 6-6-2-2 5-3 2-3-3-3Z"/></svg>
         </button>
@@ -616,6 +729,46 @@
         </section>
       </aside>
     </section>
+
+    <section class="energy-view" id="energyView">
+      <div class="energy-header">
+        <div class="energy-title-wrap">
+          <div class="energy-orb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 5 14h6l-1 8 8-12h-6l1-8Z"/></svg>
+          </div>
+          <div>
+            <h2 id="energyTitle">能量日历</h2>
+            <p id="energySubtitle">每天完成 4 个专注，点亮一整天</p>
+          </div>
+        </div>
+        <button class="icon-button" id="closeEnergy" title="返回计时器" aria-label="返回计时器">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="energy-summary">
+        <div class="energy-stat primary">
+          <strong><span id="fullEnergyDays">0</span></strong>
+          <span id="fullEnergyLabel">本月集满能量天数</span>
+        </div>
+        <div class="energy-stat">
+          <strong><span id="monthPomodoros">0</span></strong>
+          <span id="monthPomodorosLabel">本月完成专注</span>
+        </div>
+        <div class="energy-stat">
+          <strong><span id="todayEnergy">0</span>/4</strong>
+          <span id="todayEnergyLabel">今日能量</span>
+        </div>
+      </div>
+      <div class="calendar-toolbar">
+        <h3 id="calendarMonth"></h3>
+        <div class="month-actions">
+          <button class="month-button" id="previousMonth" aria-label="上个月">‹</button>
+          <button class="month-button" id="nextMonth" aria-label="下个月">›</button>
+        </div>
+      </div>
+      <div class="weekdays" id="weekdays"></div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </section>
   </main>
 
   <div class="scrim" id="settingsScrim">
@@ -679,6 +832,7 @@
           language: navigator.language.toLowerCase().startsWith("zh") ? "zh" : "en"
         },
         history: [],
+        energyDays: [],
         phase: "focus",
         completedInCycle: 0,
         task: "",
@@ -694,7 +848,8 @@
             ...saved,
             settings: { ...defaults.settings, ...saved.settings },
             timer: { ...defaults.timer, ...saved.timer },
-            history: Array.isArray(saved.history) ? saved.history : []
+            history: Array.isArray(saved.history) ? saved.history : [],
+            energyDays: Array.isArray(saved.energyDays) ? saved.energyDays : []
           };
         } catch {
           return structuredClone(defaults);
@@ -704,6 +859,7 @@
       let state = loadState();
       let ticker = null;
       let toastTimer = null;
+      let selectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       const circumference = 2 * Math.PI * 146;
       const copy = {
         zh: {
@@ -725,7 +881,11 @@
           count: (n) => `${n} 项`, switched: (phase) => `已切换到${phase}`,
           focusDone: "专注完成，休息一下吧。", breakDone: "休息结束，准备下一轮专注。",
           cleared: "专注记录已清除", pinOn: "取消始终置顶", pinOff: "始终置顶",
-          compactOn: "展开完整窗口 (Ctrl+Alt+M)", compactOff: "迷你悬浮窗 (Ctrl+Alt+M)"
+          compactOn: "展开完整窗口 (Ctrl+Alt+M)", compactOff: "迷你悬浮窗 (Ctrl+Alt+M)",
+          energy: "能量日历", energySubtitle: "每天完成 4 个专注，点亮一整天",
+          fullEnergyDays: "本月集满能量天数", monthPomodoros: "本月完成专注",
+          todayEnergy: "今日能量", backTimer: "返回计时器",
+          weekdays: ["一", "二", "三", "四", "五", "六", "日"]
         },
         en: {
           app: "Pomodoro Focus", tagline: "Keep your attention on what matters",
@@ -746,7 +906,11 @@
           count: (n) => `${n} items`, switched: (phase) => `Switched to ${phase}`,
           focusDone: "Focus complete. Take a break.", breakDone: "Break complete. Ready for the next round.",
           cleared: "Focus records cleared", pinOn: "Disable always on top", pinOff: "Always on top",
-          compactOn: "Expand window (Ctrl+Alt+M)", compactOff: "Compact window (Ctrl+Alt+M)"
+          compactOn: "Expand window (Ctrl+Alt+M)", compactOff: "Compact window (Ctrl+Alt+M)",
+          energy: "Energy Calendar", energySubtitle: "Complete 4 focus sessions to power up the day",
+          fullEnergyDays: "Fully powered days", monthPomodoros: "Monthly focus sessions",
+          todayEnergy: "Today's energy", backTimer: "Back to timer",
+          weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         }
       };
       const language = () => state.settings.language === "en" ? "en" : "zh";
@@ -783,6 +947,57 @@
       };
 
       const todayRecords = () => state.history.filter((item) => item.date === localDateKey());
+
+      const migrateEnergyDays = () => {
+        const counts = state.history.reduce((result, item) => {
+          result[item.date] = (result[item.date] || 0) + 1;
+          return result;
+        }, {});
+        const fullDates = Object.entries(counts).filter(([, count]) => count >= 4).map(([date]) => date);
+        state.energyDays = [...new Set([...state.energyDays, ...fullDates])].sort();
+        save();
+      };
+
+      const recordsForDate = (dateKey) => state.history.filter((item) => item.date === dateKey).length;
+
+      const renderEnergyCalendar = () => {
+        const year = selectedMonth.getFullYear();
+        const month = selectedMonth.getMonth();
+        const monthPrefix = `${year}-${String(month + 1).padStart(2, "0")}`;
+        const firstDay = new Date(year, month, 1);
+        const gridStart = new Date(year, month, 1 - ((firstDay.getDay() + 6) % 7));
+        const monthRecords = state.history.filter((item) => item.date.startsWith(monthPrefix));
+        const fullDays = state.energyDays.filter((date) => date.startsWith(monthPrefix)).length;
+        $("fullEnergyDays").textContent = fullDays;
+        $("monthPomodoros").textContent = monthRecords.length;
+        $("todayEnergy").textContent = Math.min(4, recordsForDate(localDateKey()));
+        $("calendarMonth").textContent = selectedMonth.toLocaleDateString(
+          language() === "zh" ? "zh-CN" : "en-US",
+          { year: "numeric", month: "long" }
+        );
+        $("weekdays").innerHTML = t("weekdays").map((day) => `<div class="weekday">${day}</div>`).join("");
+        $("calendarGrid").innerHTML = Array.from({ length: 42 }, (_, index) => {
+          const date = new Date(gridStart);
+          date.setDate(gridStart.getDate() + index);
+          const dateKey = localDateKey(date);
+          const count = Math.min(4, recordsForDate(dateKey));
+          const full = state.energyDays.includes(dateKey);
+          const classes = [
+            "calendar-day",
+            date.getMonth() !== month ? "outside" : "",
+            dateKey === localDateKey() ? "today" : "",
+            full ? "full" : ""
+          ].filter(Boolean).join(" ");
+          const cells = Array.from({ length: 4 }, (_, cell) =>
+            `<span class="energy-cell${cell < count || full ? " filled" : ""}"></span>`
+          ).join("");
+          return `<div class="${classes}" title="${dateKey}: ${count}/4">
+            <span class="day-number">${date.getDate()}</span>
+            ${full ? '<span class="full-mark">✓</span>' : ""}
+            <div class="day-energy">${cells}</div>
+          </div>`;
+        }).join("");
+      };
 
       const calculateStreak = () => {
         const days = new Set(state.history.map((item) => item.date));
@@ -863,11 +1078,19 @@
         $("clearData").textContent = t("clear");
         $("languageButton").textContent = "中文 / EN";
         $("languageButton").title = t("language");
+        $("energyButton").title = t("energy");
+        $("energyTitle").textContent = t("energy");
+        $("energySubtitle").textContent = t("energySubtitle");
+        $("fullEnergyLabel").textContent = t("fullEnergyDays");
+        $("monthPomodorosLabel").textContent = t("monthPomodoros");
+        $("todayEnergyLabel").textContent = t("todayEnergy");
+        $("closeEnergy").title = t("backTimer");
         $("todayDate").textContent = new Date().toLocaleDateString(
           language() === "zh" ? "zh-CN" : "en-US",
           { month: "short", day: "numeric", weekday: "short" }
         );
         desktop?.setLanguage(language());
+        renderEnergyCalendar();
         render();
       };
 
@@ -935,6 +1158,11 @@
             minutes: state.settings.focus,
             task: state.task.trim()
           });
+          const dateKey = localDateKey(now);
+          if (recordsForDate(dateKey) >= 4 && !state.energyDays.includes(dateKey)) {
+            state.energyDays.push(dateKey);
+            state.energyDays.sort();
+          }
           state.completedInCycle = (state.completedInCycle + 1) % 4;
         }
 
@@ -1056,6 +1284,23 @@
         save();
         applyTranslations();
       });
+      $("energyButton").addEventListener("click", () => {
+        document.querySelector(".workspace").classList.add("hidden");
+        $("energyView").classList.add("active");
+        renderEnergyCalendar();
+      });
+      $("closeEnergy").addEventListener("click", () => {
+        $("energyView").classList.remove("active");
+        document.querySelector(".workspace").classList.remove("hidden");
+      });
+      $("previousMonth").addEventListener("click", () => {
+        selectedMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1, 1);
+        renderEnergyCalendar();
+      });
+      $("nextMonth").addEventListener("click", () => {
+        selectedMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 1);
+        renderEnergyCalendar();
+      });
       document.querySelectorAll(".language-option").forEach((button) => {
         button.addEventListener("click", () => {
           state.settings.language = button.dataset.language;
@@ -1094,6 +1339,7 @@
 
       $("taskInput").value = state.task;
       syncSettingsForm();
+      migrateEnergyDays();
       desktop?.getWindowState().then(applyWindowState);
       desktop?.onWindowState(applyWindowState);
       desktop?.onToggleTimer(toggleTimer);
