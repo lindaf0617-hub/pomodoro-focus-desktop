@@ -1,6 +1,6 @@
 # 专注番茄钟
 
-[英文页面](README_EN.md)
+[English](README_EN.md)
 
 一款适用于 Windows 和 macOS 的轻量桌面番茄钟，支持始终置顶和迷你悬浮模式。
 
