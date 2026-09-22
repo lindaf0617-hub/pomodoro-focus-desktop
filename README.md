@@ -4,6 +4,8 @@
 
 一款适用于 Windows 和 macOS 的轻量桌面番茄钟，支持始终置顶和迷你悬浮模式。
 
+**手机网页版：** https://lindaf0617-hub.github.io/pomodoro-focus-desktop/
+
 ![专注番茄钟中文界面](assets/product-main-zh.png)
 
 ## 迷你悬浮窗

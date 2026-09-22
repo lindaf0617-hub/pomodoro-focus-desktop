@@ -5,6 +5,8 @@
 A compact desktop Pomodoro timer for Windows and macOS with always-on-top and
 compact floating modes.
 
+**Mobile web app:** https://lindaf0617-hub.github.io/pomodoro-focus-desktop/
+
 ![Pomodoro Focus main window](assets/product-main-en.png)
 
 ## Compact Floating Window
