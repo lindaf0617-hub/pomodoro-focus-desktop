@@ -126,6 +126,15 @@
       background: var(--cp-accent-soft);
       color: var(--cp-accent);
     }
+    .focus-only-button {
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .focus-only-button.active {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+    }
     .workspace {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 300px;
@@ -548,6 +557,7 @@
       background: transparent;
     }
     body.compact .icon-button svg { width: 12px; height: 12px; }
+    body.compact .focus-only-button { font-size: 9px; }
     body.compact .workspace { display: block; }
     body.compact .timer-card {
       min-height: 64px;
@@ -639,6 +649,7 @@
         <button class="icon-button" id="energyButton" title="能量日历" aria-label="打开能量日历">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 5 14h6l-1 8 8-12h-6l1-8Z"/></svg>
         </button>
+        <button class="icon-button focus-only-button" id="focusOnlyButton" title="连续专注模式" aria-label="切换连续专注模式">25</button>
         <button class="icon-button pin-button" id="pinButton" title="始终置顶" aria-label="切换始终置顶">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 3 8 8M13 4l7 7-3 2-3 5-2-2-6 6-1-1 6-6-2-2 5-3 2-3-3-3Z"/></svg>
         </button>
@@ -828,6 +839,7 @@
           long: 15,
           autoBreak: false,
           autoFocus: false,
+          focusOnly: false,
           sound: true,
           language: navigator.language.toLowerCase().startsWith("zh") ? "zh" : "en"
         },
@@ -882,6 +894,9 @@
           focusDone: "专注完成，休息一下吧。", breakDone: "休息结束，准备下一轮专注。",
           cleared: "专注记录已清除", pinOn: "取消始终置顶", pinOff: "始终置顶",
           compactOn: "展开完整窗口 (Ctrl+Alt+M)", compactOff: "迷你悬浮窗 (Ctrl+Alt+M)",
+          focusOnlyOn: "关闭连续专注模式", focusOnlyOff: "开启连续专注模式",
+          focusOnlyEnabled: "已开启连续专注：完成后跳过休息", focusOnlyDisabled: "已恢复标准番茄循环",
+          focusOnlyDone: "专注完成，已准备下一轮 25 分钟。",
           energy: "能量日历", energySubtitle: "每天完成 4 个专注，点亮一整天",
           fullEnergyDays: "本月集满能量天数", monthPomodoros: "本月完成专注",
           todayEnergy: "今日能量", backTimer: "返回计时器",
@@ -907,6 +922,9 @@
           focusDone: "Focus complete. Take a break.", breakDone: "Break complete. Ready for the next round.",
           cleared: "Focus records cleared", pinOn: "Disable always on top", pinOff: "Always on top",
           compactOn: "Expand window (Ctrl+Alt+M)", compactOff: "Compact window (Ctrl+Alt+M)",
+          focusOnlyOn: "Disable focus-only mode", focusOnlyOff: "Enable focus-only mode",
+          focusOnlyEnabled: "Focus-only mode enabled: breaks will be skipped", focusOnlyDisabled: "Standard Pomodoro cycle restored",
+          focusOnlyDone: "Focus complete. The next 25-minute round is ready.",
           energy: "Energy Calendar", energySubtitle: "Complete 4 focus sessions to power up the day",
           fullEnergyDays: "Fully powered days", monthPomodoros: "Monthly focus sessions",
           todayEnergy: "Today's energy", backTimer: "Back to timer",
@@ -1079,6 +1097,8 @@
         $("languageButton").textContent = "中文 / EN";
         $("languageButton").title = t("language");
         $("energyButton").title = t("energy");
+        $("focusOnlyButton").title = state.settings.focusOnly ? t("focusOnlyOn") : t("focusOnlyOff");
+        $("focusOnlyButton").classList.toggle("active", state.settings.focusOnly);
         $("energyTitle").textContent = t("energy");
         $("energySubtitle").textContent = t("energySubtitle");
         $("fullEnergyLabel").textContent = t("fullEnergyDays");
@@ -1143,6 +1163,7 @@
       };
 
       const chooseNextPhase = () => {
+        if (state.settings.focusOnly) return "focus";
         if (state.phase === "focus") return state.completedInCycle === 0 ? "long" : "short";
         return "focus";
       };
@@ -1174,7 +1195,9 @@
 
         if (!manual) {
           playTone();
-          const message = completedPhase === "focus" ? t("focusDone") : t("breakDone");
+          const message = completedPhase === "focus"
+            ? (state.settings.focusOnly ? t("focusOnlyDone") : t("focusDone"))
+            : t("breakDone");
           showToast(message);
           notify(t("app"), message);
           const shouldAutoStart = completedPhase === "focus" ? state.settings.autoBreak : state.settings.autoFocus;
@@ -1283,6 +1306,18 @@
         state.settings.language = language() === "zh" ? "en" : "zh";
         save();
         applyTranslations();
+      });
+      $("focusOnlyButton").addEventListener("click", () => {
+        state.settings.focusOnly = !state.settings.focusOnly;
+        if (state.settings.focusOnly && state.phase !== "focus") {
+          if (state.timer.running) pauseTimer();
+          state.phase = "focus";
+          state.timer = { running: false, endAt: null, remaining: durationFor("focus") };
+        }
+        save();
+        render();
+        applyTranslations();
+        showToast(state.settings.focusOnly ? t("focusOnlyEnabled") : t("focusOnlyDisabled"));
       });
       $("energyButton").addEventListener("click", () => {
         document.querySelector(".workspace").classList.add("hidden");

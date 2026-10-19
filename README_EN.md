@@ -20,6 +20,7 @@ always visible.
 
 - Always-on-top timer window
 - Compact floating mode
+- Optional focus-only mode that skips break phases
 - Chinese and English interfaces
 - Monthly energy calendar that lights up after 4 daily focus sessions
 - Focus, short-break, and long-break cycles
